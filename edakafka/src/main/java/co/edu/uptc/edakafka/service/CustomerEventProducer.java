@@ -8,39 +8,40 @@ import co.edu.uptc.edakafka.utils.JsonUtils;
 
 @Service
 public class CustomerEventProducer {
-    private static final String TOPIC_ADD = "addcustomer_events";
-    private static final String TOPIC_EDIT = "editcustomer_events";
+
+    private static final String TOPIC_ADD      = "addcustomer_events";
+    private static final String TOPIC_EDIT     = "editcustomer_events";
+    private static final String TOPIC_DELETE   = "deletecustomer_events";
     private static final String TOPIC_FINDBYID = "findcustomerbyid_events";
-    private static final String TOPIC_FINDALLCUSTOMERS = "findallcustomers_events";
+    private static final String TOPIC_FINDALL  = "findallcustomers_events";
 
     @Autowired
-    private KafkaTemplate<String, String> kafkaTemplateAdd;
-    public void sendAddCustomerEvent(Customer customer){
-        String json = null;
-        JsonUtils jsonUtils = new JsonUtils();
-        json=jsonUtils.toJson(customer);   
-        kafkaTemplateAdd.send(TOPIC_ADD, json);
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    public void sendAddCustomerEvent(Customer customer) {
+        String json = JsonUtils.toJson(customer);
+        kafkaTemplate.send(TOPIC_ADD, json);
+        System.out.println("[PRODUCER] ADD enviado: " + json);
     }
 
-    @Autowired
-    private KafkaTemplate<String, String> kafkaTemplateEdit;
-    public void sendEditCustomerEvent(Customer customer){
-        String json = null;
-        JsonUtils jsonUtils = new JsonUtils();
-        json=jsonUtils.toJson(customer);   
-        kafkaTemplateEdit.send(TOPIC_EDIT, json);
+    public void sendEditCustomerEvent(Customer customer) {
+        String json = JsonUtils.toJson(customer);
+        kafkaTemplate.send(TOPIC_EDIT, json);
+        System.out.println("[PRODUCER] EDIT enviado: " + json);
     }
 
-    @Autowired
-    private KafkaTemplate<String, String> kafkaTemplateFindById;
-    public void sendFindByCustomerIDEvent(String document){
-        kafkaTemplateFindById.send(TOPIC_FINDBYID, document);
+    public void sendDeleteCustomerEvent(String document) {
+        kafkaTemplate.send(TOPIC_DELETE, document);
+        System.out.println("[PRODUCER] DELETE enviado, document: " + document);
     }
 
-    @Autowired
-    private KafkaTemplate<String, String> kafkaTemplateFindAllOrders;
-    public void sendFindAllOrdersEvent(String customers){
-        kafkaTemplateFindAllOrders.send(TOPIC_FINDALLCUSTOMERS, customers);
+    public void sendFindByCustomerIDEvent(String document) {
+        kafkaTemplate.send(TOPIC_FINDBYID, document);
+        System.out.println("[PRODUCER] FINDBYID enviado, document: " + document);
+    }
+
+    public void sendFindAllOrdersEvent(String trigger) {
+        kafkaTemplate.send(TOPIC_FINDALL, trigger);
+        System.out.println("[PRODUCER] FINDALL enviado");
     }
 }
-

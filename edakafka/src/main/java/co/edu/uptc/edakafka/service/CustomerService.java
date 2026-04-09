@@ -3,16 +3,14 @@ package co.edu.uptc.edakafka.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import co.edu.uptc.edakafka.model.Customer;
-import co.edu.uptc.edakafka.model.Order;
 import co.edu.uptc.edakafka.repository.CustomerRepository;
 
 @Service
 public class CustomerService {
+
     @Autowired
     private final CustomerRepository customerRepository;
 
@@ -20,44 +18,34 @@ public class CustomerService {
         this.customerRepository = customerRepository;
     }
 
-    public boolean save(Customer customer){
-        boolean flag = false;
-        Customer processCustomer = customerRepository.saveAndFlush(customer);
-        if (processCustomer!=null){
-            
-            flag=true;
+    public boolean save(Customer customer) {
+        try {
+            customerRepository.saveAndFlush(customer);
+            return true;
+        } catch (Exception e) {
+            System.out.println("[SERVICE] Error guardando: " + e.getMessage());
+            return false;
         }
-        return flag;
     }
 
-    public boolean delete(Customer customer){
-        boolean flag = false;
-        try{
+    public boolean delete(Customer customer) {
+        try {
             customerRepository.delete(customer);
-            flag=true;
-        }catch(Exception e){
-            System.out.println(e.getMessage());
+            return true;
+        } catch (Exception e) {
+            System.out.println("[SERVICE] Error eliminando: " + e.getMessage());
+            return false;
         }
-        return flag;
     }
 
-        public Customer findById(String document){
-        Customer customer=null;
-        Optional<Customer> optionalCustomer = customerRepository.findById(document);
-        if (optionalCustomer.isPresent())
-            customer = optionalCustomer.get();
-        return customer;
-    }
-    
-    public List<Customer> findAll(){
-        List<Customer> listCustomer = new ArrayList<Customer>();
-        Iterable<Customer> customers = customerRepository.findAll();
-        customers.forEach((o) ->{
-            listCustomer.add(o);
-        });
-        return listCustomer;
+    public Customer findById(String document) {
+        Optional<Customer> opt = customerRepository.findById(document);
+        return opt.orElse(null);
     }
 
+    public List<Customer> findAll() {
+        List<Customer> list = new ArrayList<>();
+        customerRepository.findAll().forEach(list::add);
+        return list;
+    }
 }
-
-
