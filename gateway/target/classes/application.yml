@@ -4,17 +4,8 @@ server:
 spring:
   application:
     name: api-gateway
-  cloud:
-    gateway:
-      routes:
-        - id: customer-service
-          uri: http://edakafka:8080
-          predicates:
-            - Path=/customer/**
-        - id: login-service
-          uri: http://edakafka:8080
-          predicates:
-            - Path=/api/logins/**
+  gateway:
+    backend-url: http://edakafka:8080
 
 management:
   endpoints:
