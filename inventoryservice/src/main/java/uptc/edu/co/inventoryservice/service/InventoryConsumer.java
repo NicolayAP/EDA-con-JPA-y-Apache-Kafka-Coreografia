@@ -1,5 +1,6 @@
 package uptc.edu.co.inventoryservice.service;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -18,21 +19,25 @@ public class InventoryConsumer {
 
     private JsonUtils jsonUtils = new JsonUtils();
 
-    @KafkaListener(topics = "payment_processed_topic", groupId = "inventory_group")
-    public void handlePaymentProcessed(String message) {
+    @KafkaListener(topics = "payment_processed_topic", groupId = "inventory_group_new_v1")
+    public void handlePaymentProcessed(ConsumerRecord<String, String> record) {
+        String message = record.value();
         OrderDTO order = jsonUtils.fromJson(message, OrderDTO.class);
 
-        // 1. Intentamos descontar stock
-        boolean hasStock = inventoryService.checkAndReduceStock(order.getOrderId(), 1);
+        // Buscamos por nombre de producto como acordamos
+        boolean hasStock = inventoryService.checkAndReduceStock(order.getProductName(), order.getQuantity());
 
         if (hasStock) {
-            System.out.println("[SAGA] Inventario confirmado para orden: " + order.getProductId());
-            // Aquí podrías enviar a un tópico "order_completed_topic" si Nicolás lo
-            // necesita
+            System.out.println("[SAGA] Inventario confirmado para: " + order.getProductName());
+            
+            // Usamos el nombre que Nicolás espera en Shipping: "inventory_reserved_topic"
+            String outMessage = jsonUtils.toJson(order);
+            kafkaTemplate.send("inventory_reserved_topic", "INVENTORY_RESERVED", outMessage);
+            
         } else {
-            System.out.println("[SAGA] ERROR: Sin stock. Avisando a Pagos para reembolso.");
-            // DISPARA COMPENSACIÓN
-            kafkaTemplate.send("inventory_failed_topic", message);
+            System.out.println("[SAGA] ERROR: Sin stock para: " + order.getProductName());
+            String outMessage = jsonUtils.toJson(order);
+            kafkaTemplate.send("inventory_failed_topic", "INVENTORY_FAILED", outMessage);
         }
     }
 }

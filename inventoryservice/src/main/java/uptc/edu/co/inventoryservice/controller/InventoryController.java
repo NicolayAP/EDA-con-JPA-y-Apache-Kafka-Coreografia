@@ -21,7 +21,7 @@ public class InventoryController {
     @GetMapping("/seed")
     public String seed() {
         Inventory item = new Inventory();
-        item.setProductId(1L);
+        item.setProductName("Producto 1");
         item.setStock(10);
         repository.save(item);
         return "Producto 1 con 10 unidades creado en MySQL";

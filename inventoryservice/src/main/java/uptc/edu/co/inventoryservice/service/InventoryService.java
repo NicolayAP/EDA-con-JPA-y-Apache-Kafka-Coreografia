@@ -9,15 +9,16 @@ public class InventoryService {
     @Autowired
     private InventoryRepository repository;
 
-    public boolean checkAndReduceStock(Long productId, int quantity) {
-        return repository.findByProductId(productId)
+    public boolean checkAndReduceStock(String productName, int quantity) {
+        return repository.findByProductName(productName)
                 .map(item -> {
                     if (item.getStock() >= quantity) {
                         item.setStock(item.getStock() - quantity);
                         repository.save(item);
+                        System.out.println("[DB] Stock reducido para: " + productName);
                         return true;
                     }
                     return false;
-                }).orElse(true); // Si no existe el producto, dejamos pasar para la prueba
+                }).orElse(false); 
     }
 }
