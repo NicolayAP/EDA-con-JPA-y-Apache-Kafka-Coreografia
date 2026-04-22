@@ -1,5 +1,8 @@
 package uptc.edu.co.inventoryservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class OrderDTO {
     private Long orderId;
     private String customerDocument;

@@ -1,4 +1,4 @@
-package uptc.edu.co.inventoryservice.service.config;
+package co.edu.uptc.shippingservice.service.config;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;

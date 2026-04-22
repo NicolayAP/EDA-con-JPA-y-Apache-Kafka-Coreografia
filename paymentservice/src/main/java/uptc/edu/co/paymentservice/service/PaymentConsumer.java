@@ -18,10 +18,10 @@ public class PaymentConsumer {
     
     private JsonUtils jsonUtils = new JsonUtils();
 
-    @KafkaListener(topics = "order_created_topic", groupId = "payment_group_new_v1")
+    @KafkaListener(topics = "order_created_topic", groupId = "test_group")
     public void handleOrderCreated(ConsumerRecord<String, String> record) {
-        
         String message = record.value();
+        System.out.println("[PAYMENT CONSUMER] Mensaje recibido: " + message);
         OrderDTO order = jsonUtils.fromJson(message, OrderDTO.class);
         
         if (order.getTotalPrice() < 500) {

@@ -1,6 +1,9 @@
 package co.edu.uptc.shippingservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 // DTO compartido: misma estructura que usa Order Service en sus eventos
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class OrderEvent {
 
     private Long orderId;
